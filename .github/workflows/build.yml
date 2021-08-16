@@ -175,7 +175,8 @@ jobs:
       - run: bash src/.github/bin/setup.sh
       - run: $env:PATH=%{$env:PATH.Replace('C:\ProgramData\Chocolatey\bin;', '')}; gclient sync --no-history --shallow
       - run: dotnet build src\sdk\dotnet\webrtc /p:Configuration=Release /p:Targets=WinX64,WinX86
-      - bash: |
+      - shell: bash
+        run: |
           mkdir artifacts
           mv src/sdk/dotnet/webrtc/obj/Release/desc artifacts
           mv src/sdk/dotnet/webrtc/bin/Release artifacts/package
