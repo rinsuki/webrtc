@@ -160,3 +160,27 @@ jobs:
         with:
           name: ios
           path: src/out_ios_libs/WebRTC.framework.zip
+
+  dotnet:
+    env:
+      DEPOT_TOOLS_WIN_TOOLCHAIN: '0'
+
+    runs-on: windows-2019
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: src
+      - run: echo "$pwd\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - run: bash src/.github/bin/setup.sh
+      - run: $env:PATH=%{$env:PATH.Replace('C:\ProgramData\Chocolatey\bin;', '')}; gclient sync --no-history --shallow
+      - run: dotnet build src\sdk\dotnet\webrtc /p:Configuration=Release /p:Targets=WinX64,WinX86
+      - bash: |
+          mkdir artifacts
+          mv src/sdk/dotnet/webrtc/obj/Release/desc artifacts
+          mv src/sdk/dotnet/webrtc/bin/Release artifacts/package
+      - uses: actions/upload-artifact@v2
+        with:
+          name: dotnet_windows
+          path: artifacts
+
